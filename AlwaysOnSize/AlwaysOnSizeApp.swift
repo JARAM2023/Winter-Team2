@@ -78,4 +78,73 @@ func findFileSize() -> String {
     return getFormatedNumberString(size: fileSize)
 }
 
+struct FileInformation {
+    var fileName: String
+    var fileSize: Double
+    var path: String
+    var isChecked: Bool = false // Checkbox의 상태를 나타내는 속성
+}
+
+func findFileInformations() -> [FileInformation] {
+    var fileInformations: [FileInformation] = []
+
+    if let filePaths = try? FileManager.default.contentsOfDirectory(at: .downloadsDirectory, includingPropertiesForKeys: [.fileSizeKey]) {
+        for filePath in filePaths {
+            do {
+                let attr = try FileManager.default.attributesOfItem(atPath: filePath.path)
+                let fileSize = attr[FileAttributeKey.size] as? Double ?? 0
+                let fileName = filePath.lastPathComponent // 옵셔널 체이닝을 사용하여 안전하게 파일 이름을 가져옵니다.
+                let path = filePath.path
+                
+                fileInformations.append(FileInformation(fileName: fileName, fileSize: fileSize, path: path))
+            } catch {
+                print("Error: \(error)")
+            }
+        }
+    } else {
+        print("Failed to get contents of directory.")
+    }
+
+    return fileInformations
+}
+
+func totalCheckedFileSize(fileInformations: [FileInformation]) -> Double {
+    var totalSize: Double = 0
+    for fileInfo in fileInformations {
+        if fileInfo.isChecked {
+            totalSize += fileInfo.fileSize
+        }
+    }
+    return totalSize
+}
+
+func deleteFile(atPath path: String, filename: String) -> Bool {
+    let fileManager = FileManager.default
+    let filePath = path
+
+    do {
+        // 파일이 존재하는지 확인합니다.
+        if fileManager.fileExists(atPath: filePath) {
+            // 파일을 삭제합니다.
+            try fileManager.removeItem(atPath: filePath)
+            print("File deleted successfully at path: \(filePath)")
+            return true
+        } else {
+            print("File does not exist at path: \(filePath)")
+            return false
+        }
+    } catch {
+        print("Error deleting file: \(error)")
+        return false
+    }
+}
+
+func deleteFiles(fileInformations: [FileInformation]) {
+    for fileInfo in fileInformations {
+        if fileInfo.isChecked {
+            _ = deleteFile(atPath: fileInfo.path, filename: fileInfo.fileName)
+        }
+    }
+}
+
 
