@@ -54,15 +54,15 @@ func getFreeSizeAsString() -> String {
 }
 
 
-func findFileSize() -> String {
+func findFileSize() -> [String] {
     let filePath = try? FileManager.default.contentsOfDirectory(at: .downloadsDirectory, includingPropertiesForKeys: [.fileSizeKey])
 
     var fileSize : Double = 0
-
+    var dic : [String:Double] = [:]
+    var dicarr : [String] = []
     do {
         //return [FileAttributeKey : Any]
         for file in filePath! {
-            print(file)
 
             let attr = try FileManager.default.attributesOfItem(atPath: file.path)
             fileSize = attr[FileAttributeKey.size] as! Double
@@ -70,12 +70,20 @@ func findFileSize() -> String {
             //if you convert to NSDictionary, you can get file size old way as well.
             let dict = attr as NSDictionary
             fileSize = Double(dict.fileSize())
-            print(getFormatedNumberString(size: fileSize))
+            dic.updateValue(fileSize, forKey: file.path)
         }
     } catch {
         print("Error: \(error)")
     }
-    return getFormatedNumberString(size: fileSize)
+    var sortdic = dic.sorted { (first, second) in
+        return first.value > second.value
+        
+    }
+    for i in sortdic {
+        dicarr.append(String(i.value))
+        print(i.value)
+    }
+    return dicarr
 }
 
 struct FileInformation {

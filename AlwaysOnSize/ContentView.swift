@@ -11,6 +11,21 @@ struct ContentView: View {
     @State private var fileInformations: [FileInformation] = []
     @State var name : String  = ""
     @State var storage : String = getFreeSizeAsString()
+    var size : [String] = findFileSize()
+    var body: some View {
+        VStack {
+            Image(systemName: "globe")
+                .imageScale(.large)
+                .foregroundStyle(.tint)
+            Text(storage)
+            Text(size[0])
+        }
+        .task {
+            let timer = Timer.scheduledTimer(withTimeInterval: 3, repeats: true) { (_) in
+                Text(storage)
+            }
+            
+            timer.fire()
     @State var size : String = findFileSize()
     
     func updateFileInformations() {
