@@ -26,14 +26,14 @@ struct ContentView: View {
             }
             
             timer.fire()
-    @State var size : String = findFileSize()
-    
-    func updateFileInformations() {
-        fileInformations = findFileInformations()
-    }
-    
-    var body: some View {
-        List(fileInformations.indices, id: \.self) { index in
+            @State var size : [String] = findFileSize()
+            
+            func updateFileInformations() {
+                fileInformations = findFileInformations()
+            }
+            
+            var body: some View {
+                List(fileInformations.indices, id: \.self) { index in
                     // 각 파일 정보에 대한 Checkbox를 생성합니다.
                     Toggle(isOn: $fileInformations[index].isChecked) {
                         VStack(alignment: .leading) {
@@ -43,30 +43,32 @@ struct ContentView: View {
                         }
                     }
                 }
-        .onAppear {
-            self.fileInformations = findFileInformations()
-        }
-        .padding()
-        HStack(){
-            VStack(alignment: .leading) {
-                Image(systemName: "globe")
-                    .imageScale(.large)
-                    .foregroundStyle(.tint)
-                Text(storage)
-                Text(size)
+                .onAppear {
+                    self.fileInformations = findFileInformations()
+                }
+                .padding()
+                return HStack(){
+                    VStack(alignment: .leading) {
+                        Image(systemName: "globe")
+                            .imageScale(.large)
+                            .foregroundStyle(.tint)
+                        Text(storage)
+                        Text(size[0])
+                    }
+                    Text("Total Checked File Size:\n \(totalCheckedFileSize(fileInformations: fileInformations)) bytes")
+                    Button(action: {
+                        deleteFiles(fileInformations: fileInformations)
+                        updateFileInformations()
+                        storage = getFreeSizeAsString()
+                        size = findFileSize()
+                    }, label: {
+                        Text("Delete")
+                    })
+                    .padding()
+                }
+                .padding()
             }
-            Text("Total Checked File Size:\n \(totalCheckedFileSize(fileInformations: fileInformations)) bytes")
-            Button(action: {
-                deleteFiles(fileInformations: fileInformations)
-                updateFileInformations()
-                storage = getFreeSizeAsString()
-                size = findFileSize()
-            }, label: {
-                Text("Delete")
-            })
-            .padding()
         }
-        .padding()
     }
 }
 
@@ -85,9 +87,4 @@ struct ContentView: View {
 //        .padding()
 //    }
 //}
-
-#Preview {
-    ContentView()
-}
-
 
