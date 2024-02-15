@@ -9,15 +9,22 @@ import SwiftUI
 
 struct ContentView: View {
     @State var name : String  = ""
-    var storage : String = getFreeSizeAsString()
-    var size : String = findFileSize()
+    @State var storage : String = getFreeSizeAsString()
+    var size : [String] = findFileSize()
     var body: some View {
         VStack {
             Image(systemName: "globe")
                 .imageScale(.large)
                 .foregroundStyle(.tint)
             Text(storage)
-            Text(size)
+            Text(size[0])
+        }
+        .task {
+            let timer = Timer.scheduledTimer(withTimeInterval: 3, repeats: true) { (_) in
+                Text(storage)
+            }
+            
+            timer.fire()
         }
         .padding()
     }
